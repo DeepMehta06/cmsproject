@@ -1,0 +1,197 @@
+// // This is your Prisma schema file,
+// // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// generator client {
+//   provider = "prisma-client-js"
+//   output   = "../src/generated/prisma"
+// }
+
+// datasource db {
+//   provider     = "mongodb"
+//   url          = env("DATABASE_URL")
+//   relationMode = "prisma"
+// }
+
+// model Account {
+//   id                String  @id @default(auto()) @map("_id") @db.ObjectId
+//   userId            String  @db.ObjectId
+//   type              String
+//   provider          String
+//   providerAccountId String
+//   refresh_token     String?
+//   access_token      String?
+//   expires_at        Int?
+//   token_type        String?
+//   scope             String?
+//   id_token          String?
+//   session_state     String?
+
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   @@unique([provider, providerAccountId])
+//   @@map("accounts")
+// }
+
+// model Session {
+//   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+//   sessionToken String   @unique
+//   userId       String   @db.ObjectId
+//   expires      DateTime
+
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   @@map("sessions")
+// }
+
+// model User {
+//   id            String    @id @default(auto()) @map("_id") @db.ObjectId
+//   name          String?
+//   email         String?   @unique
+//   emailVerified DateTime?
+//   username      String?   @unique @default(nanoid())
+//   image         String?
+//   role          String?
+//   accounts      Account[]
+//   sessions      Session[]
+//   Post          Post[]
+//   createdAt     DateTime  @default(now())
+
+//   @@map("users")
+// }
+
+// model VerificationToken {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   identifier String
+//   token      String   @unique
+//   expires    DateTime
+
+//   @@map("verification_tokens")
+// }
+
+// model Post {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   title     String
+//   slug      String  @unique
+//   content   String
+//   thumbnail String?
+//   desc      String?
+//   // User      User?   @relation(fields: [userId], references: [id])
+//   keywords  String?
+//   excerpt   String?
+//   catSlug   String 
+//   category  Category? @relation(fields: [authodId], references: [slug])
+//   createdAt DateTime @default(now())
+//   authodId  String  @db.ObjectId
+//   author    User    @relation(fields: [authodId], references: [id])
+//   status    PostStatus @default(DRAFT)
+// }
+
+// model Category {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   title      String
+//   slug       String @unique
+//   Post       Post[]
+// }
+
+// enum PostStatus {
+//   DRAFT
+//   PUBLISHED
+//   DELETED
+//   ARCHIVED
+// }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mongodb"
+  url          = "mongodb+srv://deepmehta24_db_user:deep@cluster0.e3yyxmk.mongodb.net/stratus?retryWrites=true&w=majority&appName=Cluster0"
+  relationMode = "prisma"
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String  
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  username      String    @unique @default(nanoid())
+  image         String?
+  role          String?
+  accounts      Account[]
+  sessions      Session[]
+  Post          Post[]
+  createdAt     DateTime  @default(now())
+}
+
+model VerificationRequest {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+  createdAt   DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+}
+
+model Post {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  slug      String     @unique
+  content   String
+  thumbnail String?
+  desc      String?
+  keywords  String?
+  excerpt   String?
+  catSlug   String
+  category  Category?  @relation(fields: [catSlug], references: [slug])
+  createdAt DateTime   @default(now())
+  authorId  String     @db.ObjectId
+  author    User       @relation(fields: [authorId], references: [id])
+  status    PostStatus @default(DRAFT)
+}
+
+model Category {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  slug  String @unique
+  posts Post[]
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  DELETED
+  ARCHIVED
+}

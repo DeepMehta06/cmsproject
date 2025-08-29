@@ -16,10 +16,10 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
-export const metadata = {
-  title: "Stratus",
-  description: "Manage your content with ease",
-};
+// export const metadata = {
+//   title: "Stratus",
+//   description: "Manage your content with ease",
+// };
 
 export default function Home() {
   return (
