@@ -25,6 +25,7 @@ export default function Home() {
   return (
     <main className="w-full">
       <section className="flex flex-col items-center-safe justify-center-safe w-full h-[50vh] sm:h-[70vh] md:h-[80vh] lg:h-[80vh] gap-5">
+        <h1 className={`${poppins.className} text-5xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl mx-1`}>Welcome to Stratus</h1>
         <div className="flex flex-col items-center-safe justify-center-safe w-full gap-2">
           <h1 className={`${poppins.className} text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl mx-1`}>From Ideas to Impact—Fast.</h1>
           <p className={`${poppins.className} mx-1 text-center`}>Seamless workflows, smarter publishing, and infinite scalability.</p>

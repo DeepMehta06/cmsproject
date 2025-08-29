@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark"> 
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${poppins.variable}antialiased`}
+        className={`${inter.variable} ${poppins.variable}antialiased`}
       >
         <SidebarProvider>
           <AppSidebar />
