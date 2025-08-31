@@ -1,7 +1,7 @@
-import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { prisma } from "./prisma";
-import { getServerSession } from "next-auth";
+import GoogleProvider from "next-auth/providers/google"
+import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
 
 export const authOptions = {
     adapter: PrismaAdapter(prisma),
@@ -9,83 +9,52 @@ export const authOptions = {
         strategy: 'jwt'
     },
     pages: {
-        signIn: "/sign-in",
+        signIn: "/sign-in"
     },
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         })
     ],
     callbacks: {
-        // async jwt({ session, user }) {
-        //     if (user) {
-        //         const dbuser = prisma.user.findUnique({
-        //             where: { email: user.email },
-        //             select: { id: true, name: true, email: true, role: true, username: true, image: true }
-        //         })
-        //         if (dbuser) {
-        //             token.id = dbuser.id
-        //             token.name = dbuser.name
-        //             token.email = dbuser.email
-        //             token.username = dbuser.username
-        //             token.image = dbuser.image
-        //             token.role = dbuser.role
-        //         } else{
-        //             const newUser = await prisma.user.create({
-        //                 email: user.email,
-        //                 name: user.name,
-        //                 image: user.image,
-        //                 role: 'user'
-        //             });
-        //             token.id = newUser.id; 
-        //         }
-        //     }
-        //     return token;
-        // },
-
+        // whenever any jwt is created or updated this functio runs
         async jwt({ token, user }) {
-            if (user) {
-                const dbuser = await prisma.user.findUnique({
-                    where: { email: user.email },
-                    select: { id: true, name: true, email: true, role: true, username: true, image: true }
-                });
-
-                if (dbuser) {
-                    token.id = dbuser.id;
-                    token.name = dbuser.name;
-                    token.email = dbuser.email;
-                    token.username = dbuser.username;
-                    token.image = dbuser.image;
-                    token.role = dbuser.role;
+            
+            if(user){
+                const dbUser = await prisma.user.findUnique({
+                    where: {email: user.email},
+                    select: { id: true, name: true, email: true, username: true, image: true, role: true }
+                })
+                if(dbUser) {
+                    token.id = dbUser.id;
+                    token.name = dbUser.name;
+                    token.email = dbUser.email;
+                    token.username = dbUser.username;
+                    token.image = dbUser.image;
+                    token.role = dbUser.role
                 } else {
                     const newUser = await prisma.user.create({
                         data: {
                             email: user.email,
                             name: user.name,
                             image: user.image,
-                            role: "user",
-                        },
+                            role: 'user'
+                        }
                     });
                     token.id = newUser.id;
-                    token.name = newUser.name;
-                    token.email = newUser.email;
-                    token.image = newUser.image;
-                    token.role = newUser.role;
                 }
             }
             return token;
         },
-
         async session({ session, token }) {
-            if (token) {
+            if(token){
                 session.user.id = token.id;
-                session.token.id = dbuser.id;
-                session.token.name = dbuser.name;
-                session.token.email = dbuser.email;
-                session.token.username = dbuser.username;
-                session.token.image = dbuser.image;
-                session.token.role = dbuser.role;
+                session.user.name = token.name;
+                session.user.email = token.email;
+                session.user.username = token.username;
+                session.user.image = token.image;
+                session.user.role = token.role;
             }
             return session;
         },
@@ -95,4 +64,4 @@ export const authOptions = {
     }
 }
 
-export const getAuthsession = () => getServerSession(authOptions)
+export const getAuthsession = ()=> getServerSession(authOptions)

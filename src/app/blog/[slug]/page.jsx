@@ -15,7 +15,6 @@ export default function SingleBlog() {
     const tempHtml = `<p> Demo Content </p>`
     return (
         <section className={`${poppins.className} px-4 py-6 flex flex-col justify-center align-middle`}>
-            <Navbar />
             <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full">
                 <div className="flex flex-col items-center gap-3 w-full">
                     <div className="w-full md:w-11/12 lg:w-[95%]">
