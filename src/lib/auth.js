@@ -15,8 +15,9 @@ export const authOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        })
+        }),
     ],
+    secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         // whenever any jwt is created or updated this functio runs
         async jwt({ token, user }) {
