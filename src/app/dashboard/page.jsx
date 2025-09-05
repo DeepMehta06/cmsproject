@@ -9,3 +9,4 @@ export default async function Dashboard(){
     return <div className="flex justify-center-safe align-middle place-items-center-safe w-full h-[80vh]">
         Welcome Back</div>
 }
+

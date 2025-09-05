@@ -5,8 +5,9 @@ import SVGComponent from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-
+import { usePathname } from "next/navigation";
 export default function Sign_In() {
+    const pathname = usePathname();
     const [loading, setLoading] = useState(false);
     const onSignIn = async () => {
         try {

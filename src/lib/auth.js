@@ -19,7 +19,7 @@ export const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
+  // debug: true,
 
   callbacks: {
     // Runs whenever JWT is created/updated
@@ -77,13 +77,19 @@ export const authOptions = {
       return session
     },
 
-    // Handle redirects safely
     redirect({ url, baseUrl }) {
-      if (url.startsWith(baseUrl)) return url
-      return `${baseUrl}/dashboard`
-    },
+      if (url.includes("/api/auth/signout")) {
+        return baseUrl
+      }
+      if (url.includes("/api/auth/callback")) {
+        return `${baseUrl}/dashboard`
+      }
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      return baseUrl
+    }
   },
 }
 
-// Helper for server-side session fetching
 export const getAuthsession = () => getServerSession(authOptions)

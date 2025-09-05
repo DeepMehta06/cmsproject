@@ -30,12 +30,20 @@ const blogContents = [
     }
 ]
 
-export default function Blogs() {
+const fetchAllBlogs = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/get`)
+    const data =await res.json();
+    // console.log(data);
+    return data
+}
+
+export default async function Blogs() {
+    const blogData = await fetchAllBlogs()
     return (
         <section className={`grid grid-cols-2 gap-4 md:grid-cols-3 p-3 ${poppins.className}`}>
         {
-            blogContents.map((blog, index) => {
-                return <BlogCards title={blog.title} excerpt ={blog.excerpt} image={blog.image} url={blog.url} key={index} />
+            blogData.map((blog, index) => {
+                return <BlogCards title={blog.title} excerpt ={blog.excerpt} image={blog.thumbnail} url={blog.url} key={index} />
             })
         }
         </section>
@@ -44,8 +52,8 @@ export default function Blogs() {
 
 const BlogCards = ({title, excerpt, image, url}) => {
     return (
-        <div className = "bg-gray-600/10 flex flex-col justify-center items-center rounded-2xl hover:scale-105 transition-all delay-100 duration-300">
-            <Image src={image} width={350} height={170} alt={title} style={{ objectFit: 'cover' }} className="rounded-xl p-2"/>
+        <div className = "bg-gray-600/10 w-[370px] mx-5 flex flex-col justify-center items-center rounded-2xl hover:scale-105 transition-all delay-100 duration-300">
+            {image && <Image src={image} width={350} height={170} alt={title} style={{ objectFit: 'cover' }} className="rounded-xl p-2"/>}
             <div className="grid grid-rows-3">
             <h1 className="p-2 text-center text-xl font-semibold">{title}</h1>
             <p className="p-2 text-center text-sm text-gray-400">{excerpt}</p>

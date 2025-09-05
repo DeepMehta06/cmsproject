@@ -124,3 +124,61 @@
 .blog-content p {
   background: transparent;
 }
+
+.ql-snow{
+  border: transparent !important
+}
+
+.ql-editor{
+  min-height: 300px;
+  max-height: 600px;
+  overflow-y: auto;
+  font-family: Poppins;
+  color: #DCDCDC;
+}
+
+.ql-toolbar {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: gray !important;
+  color: antiquewhite;
+}
+
+.ql-container {
+  border: 1px solid #333 !important;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.ql-toolbar .ql-stroke {
+  stroke: rgb(37, 36, 35) !important;
+}
+.ql-toolbar .ql-fill {
+  fill:  rgb(37, 36, 35) !important;
+}
+
+.ql-toolbar .ql-picker {
+  color:  rgb(37, 36, 35) !important;
+}
+
+.ql-editor > p {
+  font-size: 1.1rem;
+}
+
+.ql-toolbar .ql-picker-label.ql-active,
+.ql-toolbar .ql-picker-item.ql-selected,
+.ql-toolbar button.ql-active {
+  color: rgb(37, 36, 35) !important; 
+}
+
+.ql-toolbar button.ql-active .ql-stroke {
+  stroke: rgb(37, 36, 35) !important
+}
+.ql-toolbar button.ql-active .ql-fill {
+  fill: rgb(37, 36, 35) !important;
+}
+
+.ql-syntax{
+  background-color: rgb(83,83,83);
+  font-family: monospace;
+}
