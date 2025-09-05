@@ -1,0 +1,73 @@
+/* General Blog Container */
+.blogContainer {
+  /* This remains the same, as it correctly centers all direct children. */
+  @apply flex flex-col gap-4 items-center;
+}
+
+/* Blog Thumbnail */
+.blogThumbnail {
+  /* Consolidated the rules and added object-cover for better image scaling. */
+  @apply rounded border w-[90%] md:w-[700px] object-cover;
+}
+
+/* Blog Title */
+.blogTitle {
+  /* Added text-center to ensure alignment is consistent. */
+  @apply text-2xl md:text-4xl font-bold text-center;
+}
+
+/* Main container for all metadata */
+.blogMeta {
+  /* Converted to a flex container for better control over alignment and spacing. */
+  /* It now shares the same width as the thumbnail for a cleaner look. */
+  @apply w-[90%] md:w-[700px] flex flex-col items-center gap-3 text-xs text-gray-400;
+}
+
+/* Row for date and author info */
+.blogMeta .metaRow {
+  /* Enhanced with flex-wrap and centered justification for better responsiveness. */
+  @apply flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-x-4 gap-y-2;
+}
+
+/* Container for author icon and text */
+.blogMeta .authorInfo {
+  @apply flex gap-2 items-center;
+}
+
+/* Links within the metadata (e.g., author link) */
+.blogMeta a {
+  /* Added a subtle hover effect for better user experience. */
+  @apply flex items-center gap-2 text-xs text-gray-400 transition-colors hover:text-white;
+}
+
+.blogMeta a img {
+  @apply rounded-full;
+}
+
+/* Common styling for badges (Category and Tags) */
+.blogMeta .category,
+.blogMeta .tags p {
+  /* Combined these two since their styles were identical. */
+  @apply badge bg-gray-600/30 border border-gray-700 w-fit px-2 py-1 rounded;
+}
+
+/* Container for all tags */
+.blogMeta .tags {
+  /* Added flex-wrap to allow tags to move to the next line if space is tight. */
+  @apply flex flex-wrap justify-center gap-2;
+}
+
+/* Blog post content */
+.blogContent {
+  /* Added leading-relaxed for improved readability of the main text. */
+  @apply text-sm w-[90%] md:w-2/3 text-gray-300 leading-relaxed;
+}
+
+/* Form elements, if any */
+.blogMeta select {
+  @apply bg-zinc-700 text-white font-semibold text-lg px-4 py-2 rounded-md;
+}
+
+.blogContent {
+    
+}

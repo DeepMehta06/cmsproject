@@ -25,7 +25,7 @@ export async function POST(request) {
         return NextResponse.json({ message: "Missing fields" }, { status: 400 });
     }
 
-    const statusOfPost = status?.toUpperCase() === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
+    const statusOfPost = status?.toUpperCase() === "PUBLISH" ? "PUBLISHED" : "DRAFT";
 
     try {
         let categoryCheck = await prisma.category.findUnique({

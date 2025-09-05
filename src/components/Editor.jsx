@@ -8,7 +8,7 @@ import { useState } from "react";
 import "react-quill-new/dist/quill.snow.css";
 import { slugify } from "slugmaster";
 import ImageUpload from "./ogImage";
-
+import { useRouter } from "next/navigation";
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 const poppins = Poppins({
@@ -20,6 +20,8 @@ export default function Editor({ onSave }) {
     const { register, handleSubmit } = useForm();
     const [content, setContent] = useState("");
     const [ogImage, setOgImage] = useState("");
+    const router = useRouter();
+
     const handleForm = (data) => {
         console.log({
             ...data,
@@ -27,10 +29,11 @@ export default function Editor({ onSave }) {
         });
         const generatedSlug = slugify(data.title)
         onSave({...data, content, slug:generatedSlug, ogImage})
+        router.push("/blogs");
     };
 
     const BASE_TOOLBAR = [
-        [{ header: [1, 2, 3, false] }],
+        [{ header: "1" }, { header: "2" }, { header: "3" }],
         ['bold', 'italic', 'underline', 'strike'],
         [{ list: 'ordered' }, { list: 'bullet' }],
         ['link'],

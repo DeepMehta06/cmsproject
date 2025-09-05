@@ -168,14 +168,14 @@
 .ql-toolbar .ql-picker-label.ql-active,
 .ql-toolbar .ql-picker-item.ql-selected,
 .ql-toolbar button.ql-active {
-  color: rgb(37, 36, 35) !important; 
+  color: rgb(92, 10, 180) !important; 
 }
 
 .ql-toolbar button.ql-active .ql-stroke {
-  stroke: rgb(37, 36, 35) !important
+  stroke: rgb(92, 10, 180) !important
 }
 .ql-toolbar button.ql-active .ql-fill {
-  fill: rgb(37, 36, 35) !important;
+  fill: rgb(92, 10, 180) !important;
 }
 
 .ql-syntax{
