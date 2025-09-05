@@ -26,6 +26,19 @@ const fetchSingleBlog = async (slug) => {
     return data;
 };
 
+export async function generateMetaData({params}){
+    const { slug } = params
+    const res = await fetchSingleBlog(slug)
+
+    return {
+        title: res.title,
+        description: res.excerpt,
+        openGraph: {
+        images: res.thumbnail ? [res.thumbnail] : images
+        }
+    }
+}
+
 export default async function SingleBlog({ params }) {
     const { slug } = params; // ✅ do NOT await params
     const {
