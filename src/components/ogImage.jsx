@@ -1,16 +1,19 @@
 import { storage } from "@/static/firebaseConfig"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
-export default function ImageUpload({returnImage}) {
+export default function ImageUpload({ returnImage, preLoadedImage }) {
+    console.log(preLoadedImage)
     const [imageUrl, setImageUrl] = useState();
     const [imageFile, setImageFile] = useState();
     const [loading, setLoading] = useState(false);
+
     let image;
-    const handleImageFile = async(e) => {
+    const handleImageFile = async (e) => {
         image = e.target.files[0];
         setImageFile(image);
-        if(image){
+        if (image) {
             uploadToFireBase(image);
         }
     }
@@ -19,17 +22,40 @@ export default function ImageUpload({returnImage}) {
         setLoading(true);
         console.log(loading)
         const storageRef = ref(storage, `images/${image.name}`);
-        try{
+        try {
             await uploadBytes(storageRef, image);
             const url = await getDownloadURL(storageRef);
             setImageUrl(url);
             returnImage(url);
             console.log("fireBase chal raha h")
-        }catch (error) {
+        } catch (error) {
             console.log(error.message);
-        }finally{
+        } finally {
             setLoading(false);
         }
+    }
+
+    if (preLoadedImage) {
+        return (<>
+            <label className="cursor-pointer">
+                <span className="bg-gray-400/20 border border-dashed border-gray-200 px-3 py-3 mx-10 rounded-md">
+                    Upload new cover Image
+                </span>
+                <input type="file" accept="image/*" onChange={handleImageFile} className="hidden" />
+            </label>
+            <div className="px-3 py-2 mx-8">
+                {
+                    loading && <button disabled > Uploading... </button>
+                }
+
+                <div className="flex flex-col gap-2">
+                    <h3>Uploaded Image</h3>
+                    <img className="border border-gray-400 rounded-md w-[300px] h-[200px]" src={preLoadedImage} />
+                </div>
+
+            </div>
+        </>
+        )
     }
     return (
         <div className="flex flex-col gap-5">
@@ -46,8 +72,8 @@ export default function ImageUpload({returnImage}) {
                 {
                     imageUrl && (
                         <div className="flex flex-col gap-2">
-                        <h3>Image Uploaded Successfully</h3>
-                        <img className="border border-gray-400 rounded-md w-[300px] h-[200px]" src={imageUrl} />
+                            <h3>Image Uploaded Successfully</h3>
+                            <img className="border border-gray-400 rounded-md w-[300px] h-[200px]" src={imageUrl} />
                         </div>
                     )
                 }

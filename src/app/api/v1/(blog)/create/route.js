@@ -52,7 +52,7 @@ export async function POST(request) {
                 excerpt: excerpt || null,
                 status: statusOfPost,
                 category: categoryCheck.slug,
-                category: {
+                catslug: {
                     connect: { slug: categoryCheck.slug }
                 },
                 author: {

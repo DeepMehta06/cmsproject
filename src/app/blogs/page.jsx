@@ -9,27 +9,6 @@ const poppins = Poppins({
     variable: "--font-poppins",
 });
 
-const blogContents = [
-    {
-        "title": "React V/S Next",
-        "excerpt": "React is a flexible UI library. Next.js is a framework on top of React .....",
-        "image": "/thumbnails/react_v_next.png",
-        "url": "/demo-slug"
-    },
-    {
-        "title": "Dream to be a remote developer",
-        "excerpt": "A perfect roadmap for you to get job as a remote developer.....",
-        "image": "/thumbnails/dreams.jpg",
-        "url": "/demo-slug"
-    },
-    {
-        "title": "Roadmap for BackEnd  Devs",
-        "excerpt": "A complete guide for you to become a backend developer.....",
-        "image": "/thumbnails/backend_dev.png",
-        "url": "/demo-slug"
-    }
-]
-
 const fetchAllBlogs = async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/get/`)
     const data = await res.json();

@@ -3,12 +3,13 @@
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
 import { Poppins } from "next/font/google";
-import { useState } from "react";
-// import ReactQuill from "react-quill-new";
+import { useEffect, useState } from "react";
 import "react-quill-new/dist/quill.snow.css";
 import { slugify } from "slugmaster";
 import ImageUpload from "./ogImage";
 import { useRouter } from "next/navigation";
+
+// Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 const poppins = Poppins({
@@ -16,19 +17,33 @@ const poppins = Poppins({
     weight: ["400", "700"],
 });
 
-export default function Editor({ onSave }) {
-    const { register, handleSubmit } = useForm();
+export default function Editor({ onSave, initialData }) {
+    // 1. Destructure 'setValue' from the useForm hook
+    const { register, handleSubmit, setValue } = useForm();
     const [content, setContent] = useState("");
     const [ogImage, setOgImage] = useState("");
     const router = useRouter();
+    useEffect(() => {
+        if (initialData) {
+            // Now setValue is available to populate your form fields
+            setValue('title', initialData.title);
+            setValue('keywords', initialData.keywords);
+            setValue('excerpt', initialData.excerpt);
+            setValue('category', initialData.catSlug);
+            // Assuming the main content is handled by ReactQuill's state
+            setContent(initialData.content || "");
+            setValue('status', initialData.status === 'PUBLISHED' ? 'publish' : 'draft');
+            setValue('metaDescription', initialData.desc)
+            if(initialData.thumbnail){
+                setOgImage(initialData.thumbnail)
+            }
+        }
+        // 2. Add setValue to the dependency array
+    }, [initialData, setValue]);
 
     const handleForm = (data) => {
-        console.log({
-            ...data,
-            content,
-        });
-        const generatedSlug = slugify(data.title)
-        onSave({...data, content, slug:generatedSlug, ogImage})
+        const generatedSlug = slugify(data.title);
+        onSave({ ...data, content, slug: generatedSlug, ogImage });
         router.push("/blogs");
     };
 
@@ -69,31 +84,28 @@ export default function Editor({ onSave }) {
                     {...register("category", { required: true })}
                 />
 
-                <ReactQuill value={content}
+                <ReactQuill
+                    value={content}
                     onChange={setContent}
                     modules={{
                         toolbar: BASE_TOOLBAR
                     }}
                     formats={[
-                        "header",
-                        "font",
-                        "size",
-                        "bold",
-                        "italic",
-                        "underline",
-                        "list",
-                        "link",
-                        "image",
-                        "code-block"
+                        "header", "font", "size", "bold", "italic", "underline",
+                        "list", "link", "image", "code-block"
                     ]}
-                    className={`px-3 py-2 rounded-md mx-7`} />
-                <ImageUpload returnImage ={ setOgImage }/>
+                    className={`px-3 py-2 rounded-md mx-7`}
+                />
+
+                <ImageUpload returnImage={setOgImage} preLoadedImage={ogImage} />
+
                 <input
                     type="text"
                     placeholder="Enter the meta-data..."
                     className={`font-semibold text-xl bg-zinc-600 px-3 py-2 rounded-md mx-10 my-3 ${poppins.className}`}
                     {...register("metaDescription", { required: false })}
                 />
+
                 <input
                     type="text"
                     placeholder="Enter some keywords..."
@@ -117,7 +129,6 @@ export default function Editor({ onSave }) {
                         Save
                     </button>
                 </div>
-
             </form>
         </section>
     );
