@@ -1,4 +1,11 @@
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Josefin_Sans } from "next/font/google"
+
+const josefin = Josefin_Sans({
+  subsets: ["latin"],
+  weight:["400"],
+  variable: "--font-josefins_sans",
+});
 
 import {
   Sidebar,
@@ -47,7 +54,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className={`${josefin.className}`}>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>

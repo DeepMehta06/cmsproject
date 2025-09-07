@@ -11,6 +11,9 @@ const fetchSingleBlog = async (slug) => {
     console.log(`Fetching from this exact URL: ${url}`);
 
     const res = await fetch(url, { cache: 'no-store' });
+    if(res.status === 404) {
+        notFound();
+    }
 
     // THIS IS THE MOST IMPORTANT PART
     // Let's see the raw text before we even try to parse it as JSON.
@@ -71,7 +74,7 @@ export default async function SingleBlog({ params }) {
 
 
     return (
-        <main className="bg-gray-900 text-white w-full px-4 py-8 md:py-12">
+        <main className="bg-gray-900/50 backdrop-blur-lg text-white w-full px-4 py-8 md:py-12">
             <article className="max-w-6xl mx-auto flex flex-col items-center gap-y-6">
 
                 {/* 1. Blog Post Title */}

@@ -8,8 +8,17 @@ import "react-quill-new/dist/quill.snow.css";
 import { slugify } from "slugmaster";
 import ImageUpload from "./ogImage";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { z } from 'zod'
 
-// Dynamically import ReactQuill to avoid SSR issues
+const schema = z.object ({
+    title : z.string().min(10, {message : 'Title must container 5 or more characters'}),
+    excerpt : z.string().min(10, {message:"Excerpt shall have minimum of 10 characters, please enter some details"}),
+    category : z.string().min(1, {message:"Blog shall have minimum of 1 category, please enter a category"}),
+    keywords : z.string().min(1, {message:"Blog shall have minimum of 1 keyword, please enter a keyword"}),
+    status : z.enum(["draft", "publish"]),
+    metaDescription : z.string().optional()
+})
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 const poppins = Poppins({
@@ -18,34 +27,44 @@ const poppins = Poppins({
 });
 
 export default function Editor({ onSave, initialData }) {
-    // 1. Destructure 'setValue' from the useForm hook
     const { register, handleSubmit, setValue } = useForm();
     const [content, setContent] = useState("");
     const [ogImage, setOgImage] = useState("");
     const router = useRouter();
     useEffect(() => {
         if (initialData) {
-            // Now setValue is available to populate your form fields
             setValue('title', initialData.title);
             setValue('keywords', initialData.keywords);
             setValue('excerpt', initialData.excerpt);
             setValue('category', initialData.catSlug);
-            // Assuming the main content is handled by ReactQuill's state
             setContent(initialData.content || "");
             setValue('status', initialData.status === 'PUBLISHED' ? 'publish' : 'draft');
             setValue('metaDescription', initialData.desc)
-            if(initialData.thumbnail){
+            if (initialData.thumbnail) {
                 setOgImage(initialData.thumbnail)
             }
         }
-        // 2. Add setValue to the dependency array
     }, [initialData, setValue]);
 
     const handleForm = (data) => {
-        const generatedSlug = slugify(data.title);
-        onSave({ ...data, content, slug: generatedSlug, ogImage });
-        router.push("/blogs");
+        try{
+        const generatedSlug = initialData ? initialData.slug : slugify(data.title);
+
+        const status =data.status === "publish" ? "PUBLISHED" : "DRAFT";
+
+        onSave({ ...data, content, slug: generatedSlug, ogImage, status });
+
+        toast("title", {
+            description: initialData ? "Your Blog Post is Updated" : "Your Blog Is Published",
+        });
+
+        if (status === "PUBLISHED") router.push(`/blog/${generatedSlug}`);
+    }
+    catch(error) {
+        console.log(error.message);
+    }
     };
+
 
     const BASE_TOOLBAR = [
         [{ header: "1" }, { header: "2" }, { header: "3" }],
@@ -61,27 +80,44 @@ export default function Editor({ onSave, initialData }) {
         <section className={poppins.className}>
             <form
                 className="flex flex-col space-y-4 mb-3"
-                onSubmit={handleSubmit(handleForm)}
+                onSubmit={handleSubmit(async(data) => {
+                    try{
+                        await schema.parseAsync(data);
+                        handleForm(data)
+                    }catch(error){
+                        console.log(error.message)
+                        if(error instanceof z.ZodError){
+                            error.issues.forEach(element => {
+                                toast.error("Error", {
+                                    description : `${element.message}`,
+                                    variant : "destructive"
+                                })
+                            });
+                        } else {
+                            console.error(error)
+                        }
+                    }
+                })}
             >
                 <input
                     type="text"
                     placeholder="Enter a title..."
                     className={`font-semibold text-xl bg-zinc-600 px-3 py-2 rounded-md mx-10 ${poppins.className}`}
-                    {...register("title", { required: true })}
+                    {...register("title")}
                 />
 
                 <input
                     type="text"
                     placeholder="Enter the excerpt..."
                     className={`font-semibold text-xl bg-zinc-600 px-3 py-2 rounded-md mx-10 ${poppins.className}`}
-                    {...register("excerpt", { required: true })}
+                    {...register("excerpt")}
                 />
 
                 <input
                     type="text"
                     placeholder="Enter the category..."
                     className={`font-semibold text-xl bg-zinc-600 px-3 py-2 rounded-md mx-10 ${poppins.className}`}
-                    {...register("category", { required: true })}
+                    {...register("category")}
                 />
 
                 <ReactQuill

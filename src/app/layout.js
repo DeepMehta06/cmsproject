@@ -5,6 +5,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import AuthProvider from "@/components/providers/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
+import ShaderBackground from '@/components/lightswind/shader-background';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,14 +40,16 @@ export default function RootLayout({ children }) {
         className={`${inter.variable} ${poppins.variable}antialiased`}
       >
         <AuthProvider>
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="w-full">
-              <Navbar />
-              {children}
-              <Toaster />
-            </main>
-          </SidebarProvider>
+          <ShaderBackground>
+            <SidebarProvider>
+              <AppSidebar />
+              <main className="w-full">
+                <Navbar />
+                {children}
+                <Toaster />
+              </main>
+            </SidebarProvider>
+          </ShaderBackground>
         </AuthProvider>
       </body>
     </html>
