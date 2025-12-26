@@ -15,17 +15,8 @@ const fetchSingleBlog = async (slug) => {
         notFound();
     }
 
-    // THIS IS THE MOST IMPORTANT PART
-    // Let's see the raw text before we even try to parse it as JSON.
     const rawText = await res.text();
-
-    // console.log('=============== RAW SERVER RESPONSE ===============');
-    // console.log(rawText);
-    // console.log('===================================================');
-
-    // We parse the text AFTER logging it to see if that causes an error.
     const data = JSON.parse(JSON.parse(rawText));
-
     return data;
 };
 
@@ -59,19 +50,6 @@ export default async function SingleBlog({ params }) {
         authorName,
         authorImage
     } = await fetchSingleBlog(slug);
-
-    // console.log(id,
-    //     title,
-    //     content,
-    //     thumbnail,
-    //     desc,
-    //     keywords,
-    //     excerpt,
-    //     catSlug,
-    //     createdAt,
-    //     authorId,
-    //     status)
-
 
     return (
         <main className="bg-gray-900/50 backdrop-blur-lg text-white w-full px-4 py-8 md:py-12">
