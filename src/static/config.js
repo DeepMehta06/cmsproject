@@ -1,5 +1,5 @@
 const config = {
-    perPage: 5
+    perPage: 4
 };
 
 export default config;
