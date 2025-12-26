@@ -1,0 +1,10 @@
+[build]
+  command = "npm install --legacy-peer-deps && prisma generate && next build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22.16.0"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
