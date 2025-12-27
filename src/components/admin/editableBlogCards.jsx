@@ -5,21 +5,19 @@ import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
-// ✅ Removed 'key' from props. You cannot access 'key' as a prop.
 export default function EditableBlogCards({ posts }) {
     const router = useRouter();
     const [currentStatus, setCurrentStatus] = useState(posts.status);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // ✅ Always use relative paths for internal Next.js APIs
     const endpoint = "/api/v1/state";
 
     const handleDelete = async () => {
         if (!confirm("Are you sure you want to delete this?")) return;
         
         try {
-            // Using posts.id directly instead of the 'key' variable
             const res = await fetch(`/api/v1/delete/${posts.id}`, {
                 method: "DELETE",
             });
@@ -62,9 +60,20 @@ export default function EditableBlogCards({ posts }) {
                     <p className="text-sm text-gray-300 line-clamp-1">
                         {posts.excerpt}
                     </p>
-                    <span className="text-xs text-gray-400">
-                        {dateFormat(posts.createdAt)}
-                    </span>
+                    <div className="flex items-center gap-2 mt-2">
+                        {posts.author?.image && (
+                            <Image 
+                                src={posts.author.image} 
+                                alt={posts.author.name || "Author"} 
+                                width={24} 
+                                height={24} 
+                                className="rounded-full"
+                            />
+                        )}
+                        <span className="text-xs text-gray-400">
+                            {posts.author?.name || "Unknown Author"} • {dateFormat(posts.createdAt)}
+                        </span>
+                    </div>
                 </div>
                 
                 <div className="flex gap-2 items-center">
