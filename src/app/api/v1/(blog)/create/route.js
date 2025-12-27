@@ -25,7 +25,9 @@ export async function POST(request) {
         return NextResponse.json({ message: "Missing fields" }, { status: 400 });
     }
 
-    const statusOfPost = status?.toUpperCase() === "PUBLISH" ? "PUBLISHED" : "DRAFT";
+    const statusOfPost = status?.toUpperCase() === "PUBLISH" || status?.toUpperCase() === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
+
+    console.log("Received status:", status, "→ Saving as:", statusOfPost); // Debug log
 
     try {
         let categoryCheck = await prisma.category.findUnique({
@@ -51,13 +53,8 @@ export async function POST(request) {
                 keywords: keywords || null,
                 excerpt: excerpt || null,
                 status: statusOfPost,
-                category: categoryCheck.slug,
-                catslug: {
-                    connect: { slug: categoryCheck.slug }
-                },
-                author: {
-                    connect: { id: session.user.id }
-                }
+                catSlug: categoryCheck.slug,
+                authorId: session.user.id
             },
         });
 

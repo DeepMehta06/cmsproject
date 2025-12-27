@@ -6,6 +6,8 @@ import AuthProvider from "@/components/providers/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import ShaderBackground from '@/components/lightswind/shader-background';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +35,8 @@ export const metadata = {
   description: "Manage your content with ease",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const session = await getServerSession(authOptions);
   return (
     <html lang="en" className="dark">
       <body
@@ -41,14 +44,27 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <ShaderBackground>
-            <SidebarProvider>
-              <AppSidebar />
-              <main className="w-full">
-                <Navbar />
-                {children}
-                <Toaster />
-              </main>
-            </SidebarProvider>
+            
+              <>
+              { session?.user ? (
+                <SidebarProvider>
+                  <AppSidebar />
+                  <main className="w-full">
+                    <Navbar />
+                    {children}
+                    <Toaster />
+                  </main>
+                </SidebarProvider>
+                ) : (
+                  <>
+                  <Navbar/>
+                  <main className="w-full">
+                    {children}
+                  </main>
+                  </>
+                ) }
+              </>
+            
           </ShaderBackground>
         </AuthProvider>
       </body>

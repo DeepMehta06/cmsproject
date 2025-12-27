@@ -25,13 +25,13 @@ const items = [
   { title: "Home", url: "/", icon: Home },
   { title: "Blogs", url: "/blogs", icon: Book },
   { title: "Drafts", url: "/draft", icon: Calendar },
-  {title: "Your Posts", url: "/userPost", icon: NotebookPen},
+  { title: "Your Posts", url: "/userPost", icon: NotebookPen },
   { title: "Search", url: "#", icon: Search },
   { title: "Settings", url: "#", icon: Settings },
 ]
 
 const adminItems = [
-  { title: "All Users", url: "/users", icon: User2 },
+  { title: "All Users", url: "/user", icon: User2 },
   { title: "All Posts", url: "/posts", icon: Book },
 ]
 
@@ -40,30 +40,15 @@ export default async function AppSidebar() {
   const adminCheck = await isAdmin(session);
 
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className={josefin.className}>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-          {adminCheck ? (
-            <>
-              <SidebarGroupLabel>Admin</SidebarGroupLabel>
+    <>
+      {session?.user ? (
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Application</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu className={josefin.className}>
-                  {adminItems.map((item) => (
+                  {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
                         <a href={item.url}>
@@ -75,10 +60,29 @@ export default async function AppSidebar() {
                   ))}
                 </SidebarMenu>
               </SidebarGroupContent>
-            </>
-          ) : null}
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
-  )
+              {adminCheck ? (
+                <>
+                  <SidebarGroupLabel>Admin</SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu className={josefin.className}>
+                      {adminItems.map((item) => (
+                        <SidebarMenuItem key={item.title}>
+                          <SidebarMenuButton asChild>
+                            <a href={item.url}>
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </a>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </>
+              ) : null}
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+      ) : null}
+    </>
+  );
 }

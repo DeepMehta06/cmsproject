@@ -3,7 +3,6 @@ import config from "@/static/config";
 
 export async function getUserAllBlogs({ page = 1, category , authorId}) {
     const postToShow = config.perPage || 10;
-    // Ensure page is at least 1
     const currentPage = Math.max(1, page);
 
     let query = {

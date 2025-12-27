@@ -27,18 +27,17 @@ export default async function Navbar() {
 
     return (
         <div className={`${josefin.className} flex justify-between items-center my-2 px-4 sm:px-4 lg:px-6`}>
-            {/* Left side: Logo */}
             <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center-safe justify-center-safe gap-5">
-                    <SidebarTrigger />
+                    {session && <SidebarTrigger />}
                     <Link href="/">
-                        <Notebook className="size-7 text-primary" /> {/* Brand logo */}
+                        <Notebook className="size-7 text-primary" /> 
                     </Link>
                 </div>
             </div>
 
             <div className="flex items-center gap-3">
-                <BackToBlogsLink />
+                {session && <BackToBlogsLink />}
                 {!session ? (
                     <Link href="/sign-in" className="px-3 py-1 text-sm hover:underline">
                         Sign-In/Sign-Up

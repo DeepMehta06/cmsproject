@@ -4,29 +4,32 @@ import { stringify } from "querystring";
 
 export async function GET(request, context){
     const {slug} = await context.params;
-    const post = await prisma.post.findUnique({
-        where:{
-            slug: slug,
-            status: "PUBLISHED"
-        },
-        include : {
-            author : {
-                select : {
-                    name : true,
-                    image : true
+    
+    try {
+        const post = await prisma.post.findFirst({
+            where:{
+                slug: slug,
+                status: "PUBLISHED"
+            },
+            include : {
+                author : {
+                    select : {
+                        name : true,
+                        image : true
+                    }
                 }
             }
+        })
+
+        console.log("Fetched post:", post);
+
+        if(!post){
+            return NextResponse.json({message : "Could not find the post"}, {status : 404})
         }
-    })
 
-    console.log(post);
-
-    if(!post){
-        return NextResponse.json({message : "could not the post"}, {status : 404})
+        return NextResponse.json(post, {status : 200})
+    } catch (error) {
+        console.error("Error fetching post:", error);
+        return NextResponse.json({message : "Error fetching post"}, {status : 500})
     }
-
-    return NextResponse.json(JSON.stringify(post), {
-        status : 200,
-        headers : { 'content-type' : "application/json"}
-    })
 }

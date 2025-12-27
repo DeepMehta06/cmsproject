@@ -15,8 +15,7 @@ const fetchSingleBlog = async (slug) => {
         notFound();
     }
 
-    const rawText = await res.text();
-    const data = JSON.parse(JSON.parse(rawText));
+    const data = await res.json();
     return data;
 };
 

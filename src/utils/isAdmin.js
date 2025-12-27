@@ -4,7 +4,7 @@ const listOfAdmins = [
 ]
 
 export default async function isAdmin(session){
-    if(!session) return false;
+    if(!session || !session.user || !session.user.email) return false;
     console.log(session.user)
     let userEmail = session.user.email.toLowerCase().trim();
 
@@ -12,7 +12,7 @@ export default async function isAdmin(session){
         return singleEmail.toLowerCase().trim() === userEmail
     })
     console.log(emailMatch, ' email match')
-    if(session.user.role == 'admin' || (session.user?.email && emailMatch)){
+    if(session.user.role == 'admin' || emailMatch){
         return true;
     }
     return false;
