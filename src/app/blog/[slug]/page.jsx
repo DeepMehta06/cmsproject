@@ -34,7 +34,7 @@ export async function generateMetaData({params}){
 }
 
 export default async function SingleBlog({ params }) {
-    const { slug } = params; // ✅ do NOT await params
+    const { slug } = await params; 
     const {
         id,
         title,

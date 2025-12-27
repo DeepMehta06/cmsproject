@@ -2,6 +2,8 @@ import { getAllBlogs } from "@/app/actions/getBlogs";
 import EditableBlogCards from "./editableBlogCards";
 import Pagination from "../pagination";
 import config from "@/static/config";
+import CategoryFilter from "../CategoryFilter";
+
 export default async function AdminAllPosts({ page, category }) {
     const { post, count } = await getAllBlogs({ page, category });
 
@@ -12,6 +14,7 @@ export default async function AdminAllPosts({ page, category }) {
     return (
         <section className="p-8 flex flex-col gap-5">
             <p className="text-sm text-gray-500">Total posts: {count}</p>
+            <CategoryFilter />
             {post.map(item => (
                 <EditableBlogCards posts={item} key={item.id} />
             ))}

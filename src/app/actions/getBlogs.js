@@ -12,7 +12,7 @@ export async function getAllBlogs({ page = 1, category }) {
         where: {
             ...(category && {
                 catSlug: {
-                    equals: category,
+                    contains: category,
                     mode: 'insensitive'
                 }
             })
