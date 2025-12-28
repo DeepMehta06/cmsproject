@@ -26,7 +26,6 @@ const items = [
   { title: "Blogs", url: "/blogs", icon: Book },
   { title: "Drafts", url: "/draft", icon: Calendar },
   { title: "Your Posts", url: "/userPost", icon: NotebookPen },
-  { title: "Search", url: "#", icon: Search },
   { title: "Settings", url: "#", icon: Settings },
 ]
 

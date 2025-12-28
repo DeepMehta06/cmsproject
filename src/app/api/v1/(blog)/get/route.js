@@ -16,6 +16,16 @@ export async function GET(request) {
                     }
                 })
             },
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true
+                    }
+                }
+            },
             orderBy: {
                 createdAt: 'desc'
             }

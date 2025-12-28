@@ -1,35 +1,34 @@
-import { storage } from "@/static/firebaseConfig"
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+import { uploadImage } from "@/lib/supabase"
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function ImageUpload({ returnImage, preLoadedImage }) {
     console.log(preLoadedImage)
     const [imageUrl, setImageUrl] = useState();
+    const [imagePath, setImagePath] = useState();
     const [imageFile, setImageFile] = useState();
     const [loading, setLoading] = useState(false);
 
-    let image;
     const handleImageFile = async (e) => {
-        image = e.target.files[0];
+        const image = e.target.files[0];
         setImageFile(image);
         if (image) {
-            uploadToFireBase(image);
+            uploadToSupabase(image);
         }
     }
 
-    const uploadToFireBase = async () => {
+    const uploadToSupabase = async (image) => {
         setLoading(true);
         console.log(loading)
-        const storageRef = ref(storage, `images/${image.name}`);
         try {
-            await uploadBytes(storageRef, image);
-            const url = await getDownloadURL(storageRef);
+            const { url, path } = await uploadImage(image, 'blog-thumbnails');
             setImageUrl(url);
-            returnImage(url);
-            console.log("fireBase chal raha h")
+            setImagePath(path);
+            returnImage(url, path);
+            console.log("Supabase upload successful")
         } catch (error) {
             console.log(error.message);
+            alert(error.message || 'Failed to upload image');
         } finally {
             setLoading(false);
         }

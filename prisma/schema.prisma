@@ -40,7 +40,7 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
-  username      String?   @unique
+  username      String?
   image         String?
   role          String?
   accounts      Account[]
@@ -61,20 +61,21 @@ model VerificationToken {
 }
 
 model Post {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  slug      String     @unique
-  content   String
-  thumbnail String?
-  desc      String?
-  keywords  String?
-  excerpt   String?
-  catSlug   String
-  category  Category?  @relation(fields: [catSlug], references: [slug])
-  createdAt DateTime   @default(now())
-  authorId  String     @db.ObjectId
-  author    User       @relation(fields: [authorId], references: [id])
-  status    PostStatus @default(DRAFT)
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  slug          String     @unique
+  content       String
+  thumbnail     String?
+  thumbnailPath String?
+  desc          String?
+  keywords      String?
+  excerpt       String?
+  catSlug       String
+  category      Category?  @relation(fields: [catSlug], references: [slug])
+  createdAt     DateTime   @default(now())
+  authorId      String     @db.ObjectId
+  author        User       @relation(fields: [authorId], references: [id])
+  status        PostStatus @default(DRAFT)
 }
 
 model Category {
