@@ -11,8 +11,16 @@ export const poppins = Poppins({
 });
 
 export default function updateDraft({ params }) {
-    const { slug } = params;
-    const [post, setPost] = useState()
+    const [slug, setSlug] = useState(null);
+    const [post, setPost] = useState(null);
+
+    useEffect(() => {
+        const resolveParams = async () => {
+            const resolvedParams = await params;
+            setSlug(resolvedParams.slug);
+        };
+        resolveParams();
+    }, [params]);
 
     useEffect(() => {
         const fetchPost = async () => {

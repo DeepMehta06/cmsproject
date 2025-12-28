@@ -6,7 +6,7 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function PUT(request, { params }){
-    const { slug } = params;
+    const { slug } = await params;
     const body = await request.json();
     const {title, ogImage, content, excerpt, metaDescription, category, keywords, status} = body;
 
@@ -54,7 +54,7 @@ export async function PUT(request, { params }){
 }
 
 export async function GET(request, { params }){
-    const { slug } = params;
+    const { slug } = await params;
 
     // --- LOG 1: What slug are we getting from the URL? ---
     // console.log(`[LOG 1] GET request received for slug: "${slug}"`);

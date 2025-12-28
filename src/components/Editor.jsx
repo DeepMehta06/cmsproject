@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
 import { Poppins } from "next/font/google";
@@ -9,15 +10,35 @@ import { slugify } from "slugmaster";
 import ImageUpload from "./ogImage";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { z } from 'zod'
+import { Button } from "./ui/button";
+import z from "zod";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import AIContent from "@/utils/ai-content";
+import { Sparkle, Wand2 } from "lucide-react";
 
-const schema = z.object ({
-    title : z.string().min(10, {message : 'Title must container 5 or more characters'}),
-    excerpt : z.string().min(10, {message:"Excerpt shall have minimum of 10 characters, please enter some details"}),
-    category : z.string().min(1, {message:"Blog shall have minimum of 1 category, please enter a category"}),
-    keywords : z.string().min(1, {message:"Blog shall have minimum of 1 keyword, please enter a keyword"}),
-    status : z.enum(["draft", "publish"]),
-    metaDescription : z.string().optional()
+
+const schema = z.object({
+    title: z.string().min(10, { message: 'Title must container 5 or more characters' }),
+    excerpt: z.string().min(10, { message: "Excerpt shall have minimum of 10 characters, please enter some details" }),
+    category: z.string().min(1, { message: "Blog shall have minimum of 1 category, please enter a category" }),
+    keywords: z.string().min(1, { message: "Blog shall have minimum of 1 keyword, please enter a keyword" }),
+    status: z.enum(["draft", "publish"]),
+    metaDescription: z.string().optional()
 })
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
@@ -30,7 +51,12 @@ export default function Editor({ onSave, initialData }) {
     const { register, handleSubmit, setValue } = useForm();
     const [content, setContent] = useState("");
     const [ogImage, setOgImage] = useState("");
+    const [isSelected, setIsSelected] = useState(false);
     const router = useRouter();
+    const ideaRef = useRef(null);
+    const closeDialogRef = useRef(null);
+    const quillRef = useRef(null);
+    
     useEffect(() => {
         if (initialData) {
             setValue('title', initialData.title);
@@ -47,22 +73,22 @@ export default function Editor({ onSave, initialData }) {
     }, [initialData, setValue]);
 
     const handleForm = (data) => {
-        try{
-        const generatedSlug = initialData ? initialData.slug : slugify(data.title);
+        try {
+            const generatedSlug = initialData ? initialData.slug : slugify(data.title);
 
-        const status =data.status === "publish" ? "PUBLISHED" : "DRAFT";
+            const status = data.status === "publish" ? "PUBLISHED" : "DRAFT";
 
-        onSave({ ...data, content, slug: generatedSlug, ogImage, status });
+            onSave({ ...data, content, slug: generatedSlug, ogImage, status });
 
-        toast("title", {
-            description: initialData ? "Your Blog Post is Updated" : "Your Blog Is Published",
-        });
+            toast("title", {
+                description: initialData ? "Your Blog Post is Updated" : "Your Blog Is Published",
+            });
 
-        if (status === "PUBLISHED") router.push(`/blog/${generatedSlug}`);
-    }
-    catch(error) {
-        console.log(error.message);
-    }
+            if (status === "PUBLISHED") router.push(`/blog/${generatedSlug}`);
+        }
+        catch (error) {
+            console.log(error.message);
+        }
     };
 
 
@@ -76,21 +102,111 @@ export default function Editor({ onSave, initialData }) {
         ['code-block']
     ];
 
+    const handleSelectionChanged = () => {
+        const selection = quillRef?.current?.getEditor().getSelection();
+        console.log(selection, 'selection');
+        setIsSelected(selection && selection.length > 0);
+    }
+
+    const handleGenerateContentUsingAI = async () => {
+        try {
+            const promptText = ideaRef.current?.value;
+
+            if (!promptText) {
+                toast.error("Error", {
+                    description: "Please enter a topic or idea first"
+                });
+                return;
+            }
+
+            toast.info("Generating...", {
+                description: "AI is generating your content"
+            });
+
+            const res = await AIContent({
+                text: promptText,
+                customInstruction: 'Generate a comprehensive, well-structured blog post based on the following topic or idea. The content should be: Informative and engaging, Written in a professional yet accessible tone, Include clear headings and subheading, Contain relevant examples or explanations, Be between 800-1000 words, SEO-friendly with natural keyword usage',
+                contentGeneration: true
+            });
+
+            if (res) {
+                setContent(res);
+                toast.success("Success", {
+                    description: "Content generated successfully!"
+                });
+                closeDialogRef.current?.click();
+            }
+        } catch (error) {
+            console.error("AI Generation failed:", error);
+            toast.error("Error", {
+                description: "Failed to generate content. Please try again."
+            });
+        }
+    };
+
+    const handleRewriteContentUsingAI = async () => {
+        try {
+            const editor = quillRef?.current?.getEditor();
+            const selection = editor?.getSelection();
+            
+            if (!selection || selection.length === 0) {
+                toast.error("Error", {
+                    description: "Please select some text to rewrite"
+                });
+                return;
+            }
+
+            const selectedText = editor.getText(selection.index, selection.length);
+
+            if (!selectedText.trim()) {
+                toast.error("Error", {
+                    description: "Selected text is empty"
+                });
+                return;
+            }
+
+            toast.info("Rewriting...", {
+                description: "AI is rewriting your selected content"
+            });
+
+            const res = await AIContent({
+                text: selectedText,
+                customInstruction: 'Rewrite this content to be more engaging, clear, and professional while maintaining the original meaning. Improve the flow and readability.',
+                contentGeneration: false
+            });
+
+            if (res) {
+                // Replace the selected text with AI-generated content
+                editor.deleteText(selection.index, selection.length);
+                editor.clipboard.dangerouslyPasteHTML(selection.index, res);
+                
+                toast.success("Success", {
+                    description: "Content rewritten successfully!"
+                });
+            }
+        } catch (error) {
+            console.error("AI Rewrite failed:", error);
+            toast.error("Error", {
+                description: "Failed to rewrite content. Please try again."
+            });
+        }
+    };
+
     return (
         <section className={poppins.className}>
             <form
                 className="flex flex-col space-y-4 mb-3"
-                onSubmit={handleSubmit(async(data) => {
-                    try{
+                onSubmit={handleSubmit(async (data) => {
+                    try {
                         await schema.parseAsync(data);
                         handleForm(data)
-                    }catch(error){
+                    } catch (error) {
                         console.log(error.message)
-                        if(error instanceof z.ZodError){
+                        if (error instanceof z.ZodError) {
                             error.issues.forEach(element => {
                                 toast.error("Error", {
-                                    description : `${element.message}`,
-                                    variant : "destructive"
+                                    description: `${element.message}`,
+                                    variant: "destructive"
                                 })
                             });
                         } else {
@@ -121,8 +237,10 @@ export default function Editor({ onSave, initialData }) {
                 />
 
                 <ReactQuill
+                ref = {quillRef}
                     value={content}
                     onChange={setContent}
+                    onChangeSelection={handleSelectionChanged}
                     modules={{
                         toolbar: BASE_TOOLBAR
                     }}
@@ -132,6 +250,70 @@ export default function Editor({ onSave, initialData }) {
                     ]}
                     className={`px-3 py-2 rounded-md mx-7`}
                 />
+                
+                <div className="flex gap-3 m-10 ">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" className="flex gap-2 items-center">
+                                            <Wand2 className="w-4 h-4" />
+                                            Generate with AI
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[525px]">
+                                        <DialogHeader>
+                                            <DialogTitle>Generate with AI</DialogTitle>
+                                            <DialogDescription>
+                                                Describe the topic or idea you want to create content about.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <textarea 
+                                            ref={ideaRef} 
+                                            rows={10} 
+                                            placeholder="E.g., Write about the benefits of meditation..."
+                                            className="bg-zinc-800/20 p-3 border border-zinc-700 rounded-lg outline-none scrollbar-hide resize-none focus:ring-2 focus:ring-zinc-600"
+                                        />
+                                        <DialogFooter>
+                                            <DialogClose asChild ref={closeDialogRef}>
+                                                <Button variant="ghost">Cancel</Button>
+                                            </DialogClose>
+                                            <Button onClick={handleGenerateContentUsingAI}>
+                                                <Sparkle className="w-4 h-4 mr-2" />
+                                                Generate
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Create new content from scratch using AI</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    {isSelected && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button 
+                                        variant="outline" 
+                                        className="flex gap-2 items-center"
+                                        onClick={handleRewriteContentUsingAI}
+                                        type="button"
+                                    >
+                                        <Sparkle className="w-4 h-4" />
+                                        Rewrite with AI
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Improve and rewrite your selected text using AI</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
+                </div>
 
                 <ImageUpload returnImage={setOgImage} preLoadedImage={ogImage} />
 
