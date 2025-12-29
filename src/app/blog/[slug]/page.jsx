@@ -27,7 +27,7 @@ export async function generateMetaData({params}){
         title: res.title,
         description: res.excerpt,
         openGraph: {
-        images: res.thumbnail ? [res.thumbnail] : images
+        images: res.thumbnail ? [res.thumbnail] : [`${process.env.NEXT_PUBLIC_BASE_URL}/api/og?title=${res.title}`]
         }
     }
 }
