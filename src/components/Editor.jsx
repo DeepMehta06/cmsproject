@@ -4,8 +4,10 @@ import { useRef } from "react";
 import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
 import { Poppins } from "next/font/google";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "react-quill-new/dist/quill.snow.css";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
 import { slugify } from "slugmaster";
 import ImageUpload from "./ogImage";
 import { useRouter } from "next/navigation";
@@ -29,7 +31,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import AIContent from "@/utils/ai-content";
-import { Sparkle, Wand2 } from "lucide-react";
+import { Sparkle, Wand2, FileText, Code } from "lucide-react";
+import { marked } from 'marked';
 
 
 const schema = z.object({
@@ -40,7 +43,12 @@ const schema = z.object({
     status: z.enum(["draft", "publish"]),
     metaDescription: z.string().optional()
 })
+
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+const MDEditor = dynamic(
+    () => import("@uiw/react-md-editor").then((mod) => mod.default),
+    { ssr: false }
+);
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -52,10 +60,12 @@ export default function Editor({ onSave, initialData }) {
     const [content, setContent] = useState("");
     const [ogImage, setOgImage] = useState("");
     const [isSelected, setIsSelected] = useState(false);
+    const [editorMode, setEditorMode] = useState("rich"); // "rich" or "markdown"
     const router = useRouter();
     const ideaRef = useRef(null);
     const closeDialogRef = useRef(null);
     const quillRef = useRef(null);
+
     
     useEffect(() => {
         if (initialData) {
@@ -130,7 +140,15 @@ export default function Editor({ onSave, initialData }) {
             });
 
             if (res) {
-                setContent(res);
+                // If in Rich Text mode, convert markdown to HTML
+                if (editorMode === "rich") {
+                    const htmlContent = marked.parse(res);
+                    setContent(htmlContent);
+                } else {
+                    // In Markdown mode, use raw markdown
+                    setContent(res);
+                }
+                
                 toast.success("Success", {
                     description: "Content generated successfully!"
                 });
@@ -236,20 +254,58 @@ export default function Editor({ onSave, initialData }) {
                     {...register("category")}
                 />
 
-                <ReactQuill
-                ref = {quillRef}
-                    value={content}
-                    onChange={setContent}
-                    onChangeSelection={handleSelectionChanged}
-                    modules={{
-                        toolbar: BASE_TOOLBAR
-                    }}
-                    formats={[
-                        "header", "font", "size", "bold", "italic", "underline",
-                        "list", "link", "image", "code-block"
-                    ]}
-                    className={`px-3 py-2 rounded-md mx-7`}
-                />
+                {/* Editor Mode Toggle */}
+                <div className="flex gap-2 mx-10 mb-4">
+                    <Button
+                        type="button"
+                        variant={editorMode === "rich" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setEditorMode("rich")}
+                        className="flex gap-2 items-center"
+                    >
+                        <FileText className="w-4 h-4" />
+                        Rich Text
+                    </Button>
+                    <Button
+                        type="button"
+                        variant={editorMode === "markdown" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setEditorMode("markdown")}
+                        className="flex gap-2 items-center"
+                    >
+                        <Code className="w-4 h-4" />
+                        Markdown
+                    </Button>
+                </div>
+
+                {/* Conditional Editor Rendering */}
+                {editorMode === "rich" ? (
+                    <ReactQuill
+                        ref={quillRef}
+                        value={content}
+                        onChange={setContent}
+                        onChangeSelection={handleSelectionChanged}
+                        modules={{
+                            toolbar: BASE_TOOLBAR
+                        }}
+                        formats={[
+                            "header", "font", "size", "bold", "italic", "underline",
+                            "list", "link", "image", "code-block"
+                        ]}
+                        className={`px-3 py-2 rounded-md mx-7`}
+                    />
+                ) : (
+                    <div className="mx-10 mb-4" data-color-mode="dark">
+                        <MDEditor
+                            value={content}
+                            onChange={setContent}
+                            preview="live"
+                            height={500}
+                            visibleDragbar={false}
+                            highlightEnable={true}
+                        />
+                    </div>
+                )}
                 
                 <div className="flex gap-3 m-10 ">
                     <TooltipProvider>
