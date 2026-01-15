@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { rateLimit } from "./utils/rateLimits";
+// import { rateLimit } from "./utils/rateLimits"; // Disabled - needs valid Upstash credentials
 
 export async function middleware(request){
 
@@ -8,13 +8,14 @@ export async function middleware(request){
         
         const origin = request.headers.get('origin');
         if(allowedOrigins.includes(origin)){
-            return NextResponse.json({message : "CUnauthorized domain"}, {status : 403});
+            return NextResponse.json({message : "Unauthorized domain"}, {status : 403});
         }
 
-        let ip = request.ip || request.headers.get("x-forwarded-for") || 'unknown';
-        const {limit, remaining, reset} =await rateLimit.limit(ip);
-        if(remaining==0) return NextResponse.json({message : "You have reached the request limit"}, {status : 491})
-        console.log(limit, remaining, 'limit and remaining')
+        // Rate limiting disabled - uncomment when Upstash is configured
+        // let ip = request.ip || request.headers.get("x-forwarded-for") || 'unknown';
+        // const {limit, remaining, reset} = await rateLimit.limit(ip);
+        // if(remaining==0) return NextResponse.json({message : "You have reached the request limit"}, {status : 429})
+        // console.log(limit, remaining, 'limit and remaining')
     }
     return NextResponse.next();
 }

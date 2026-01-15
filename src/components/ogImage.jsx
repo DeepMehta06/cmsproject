@@ -1,4 +1,4 @@
-import { uploadImage } from "@/lib/supabase"
+import { uploadImage } from "@/lib/storage"
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
@@ -13,11 +13,11 @@ export default function ImageUpload({ returnImage, preLoadedImage }) {
         const image = e.target.files[0];
         setImageFile(image);
         if (image) {
-            uploadToSupabase(image);
+            uploadToCloudinary(image);
         }
     }
 
-    const uploadToSupabase = async (image) => {
+    const uploadToCloudinary = async (image) => {
         setLoading(true);
         console.log(loading)
         try {
@@ -25,7 +25,7 @@ export default function ImageUpload({ returnImage, preLoadedImage }) {
             setImageUrl(url);
             setImagePath(path);
             returnImage(url, path);
-            console.log("Supabase upload successful")
+            console.log("Cloudinary upload successful")
         } catch (error) {
             console.log(error.message);
             alert(error.message || 'Failed to upload image');

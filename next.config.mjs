@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    outputFileTracingRoot: 'C:\\Users\\Deep\\OneDrive\\Desktop\\Coding\\Nextjs\\cmsproject',
     images : {
         remotePatterns: [
             {
@@ -9,17 +10,12 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'firebasestorage.googleapis.com',
+                hostname: 'res.cloudinary.com',
                 port: '',
             },
             {
                 protocol: 'https',
                 hostname: 'inyfujgqwujgwbgllavo.supabase.co',
-                port: '',
-            },
-            {
-                protocol: 'https',
-                hostname: '*.supabase.co',
                 port: '',
             },
         ],
